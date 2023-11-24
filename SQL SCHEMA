@@ -1,0 +1,120 @@
+CREATE DATABASE VMDS;
+
+USE VMDS;
+
+CREATE TABLE employee(
+emp_ID INT AUTO_INCREMENT UNIQUE,
+emp_name VARCHAR(25) NOT NULL,
+team_ID INT NOT NULL,
+DOB DATE NOT NULL,
+sex VARCHAR(10) NOT NULL,
+mng_ID INT NOT NULL,
+salary BIGINT NOT NULL,
+PRIMARY KEY(emp_ID),
+-- FOREIGN KEY (team_ID) REFERENCES team (team_ID), alter once done
+FOREIGN KEY (mng_ID) REFERENCES employee (emp_ID)
+);
+
+CREATE TABLE team(
+team_ID INT AUTO_INCREMENT,
+team_name VARCHAR(25) NOT NULL,
+mng_ID INT NOT NULL,
+-- sales INT NOT NULL,
+bay_no INT NOT NULL,
+mng_start_date DATE NOT NULL,
+PRIMARY KEY(team_ID),
+FOREIGN KEY (mng_ID) REFERENCES employee (emp_ID)
+);
+
+ALTER TABLE employee
+ADD FOREIGN KEY (team_ID) REFERENCES team (team_ID);
+
+DESC employee;
+
+
+CREATE TABLE parts(
+part_ID INT AUTO_INCREMENT,
+part_Name VARCHAR(25) NOT NULL,
+part_description VARCHAR(100) ,
+manufacturer VARCHAR(25) ,
+purchase_date DATE NOT NULL,
+purchase_price BIGINT NOT NULL,
+dealer VARCHAR(25) NOT NULL,
+quantity INT DEFAULT 0,
+team_ID INT NOT NULL,
+vehicle_ID INT,
+PRIMARY KEY (part_ID),
+FOREIGN KEY (team_ID) REFERENCES team (team_ID),
+FOREIGN KEY (vehicle_ID) REFERENCES vehicles (vehicle_ID)
+);
+
+CREATE TABLE vehicles(
+vehicle_ID INT NOT NULL,
+customer_ID INT NOT NULL,
+vehicle_Name VARCHAR(25) NOT NULL,
+color VARCHAR(25),
+model VARCHAR(25) DEFAULT 'BASIC VARIANT',
+year YEAR,
+kms_driven FLOAT,
+license_plate VARCHAR(25) UNIQUE,
+prev_service DATE ,
+prev_service_description VARCHAR(100),
+fuel_level VARCHAR(25) DEFAULT 'EMPTY',
+VIN VARCHAR(25) UNIQUE,
+engine_NO VARCHAR(25) UNIQUE,
+PRIMARY KEY(vehicle_ID),
+FOREIGN KEY (customer_ID) REFERENCES customer(customer_ID)
+);
+-- used to refernce non primary keys
+CREATE INDEX idx_kms_driven ON vehicles(kms_driven);
+
+CREATE TABLE maintenance_record(
+record_ID INT AUTO_INCREMENT,
+vehicle_ID INT,
+customer_ID INT,
+service_type VARCHAR(100) DEFAULT 'FREE SERVICE',
+date DATE,
+time TIME,
+cost_estimated FLOAT,
+odometer_reading FLOAT,
+customer_requirements VARCHAR(100),
+description VARCHAR(100),
+est_delivery_date DATE,
+PRIMARY KEY(record_ID),
+FOREIGN KEY (vehicle_ID) REFERENCES vehicles (vehicle_ID),
+FOREIGN KEY (customer_ID) REFERENCES customer (customer_ID),
+FOREIGN KEY (odometer_reading) REFERENCES vehicles (kms_driven)
+);
+
+CREATE TABLE payment(
+payment_ID INT AUTO_INCREMENT,
+customer_ID INT,
+vehicle_ID INT,
+invoice_ID VARCHAR(25) NOT NULL,
+payment_date BIGINT,
+amount_paid DATE,
+payment_status ENUM('PAID','PENDING'),
+mode_of_payment VARCHAR(50) DEFAULT'CASH',
+PRIMARY KEY (payment_ID),
+FOREIGN KEY (vehicle_ID) REFERENCES vehicles (vehicle_ID),
+FOREIGN KEY (customer_ID) REFERENCES customer (customer_ID)
+);
+
+CREATE TABLE customer(
+customer_ID INT AUTO_INCREMENT,
+customer_name VARCHAR(25) NOT NULL, 
+contact_number BIGINT NOT NULL,
+DOB DATE NOT NULL,
+address VARCHAR (1000) NOT NULL,
+emailID VARCHAR(25) NOT NULL,
+PRIMARY KEY(customer_ID)
+);
+
+CREATE INDEX idx_emailID ON customer(emailID);
+CREATE TABLE login_info(
+username VARCHAR(25),
+password VARCHAR(30),
+FOREIGN KEY(username) REFERENCES customer(emailID)
+);
+
+SELECT * FROM customer;
